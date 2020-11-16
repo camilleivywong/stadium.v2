@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.1.9/p5.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/13.0.1/Tone.min.js"></script>
+  <script src="http://code.jquery.com/jquery-1.11.0.min.js"></script>
+  <title>stadium.v5</title>
+<style>
+html, body{
+  margin: 0;
+  padding:0;
+  cursor: pointer;
+  display: flex;
+  overflow: hidden;
+} 
+
+</style>
+</head>
+
+<body>
+
+
+<script type="text/javascript"> 
+
+var cols = 5;
+var rows = 3; 
+
+let grid = [];
+let stadium = [];
+
+let duoSynth;
+
+
+const notes = ['A#3','F3','G3','A3',
+               'A#3','F3','G3','A3',
+               'B3','F#3','G#3','A#3',
+               'B3','F#3','G#3','A#3',
+               'C4','G3','A3','B3',
+               'C4','G3','A3','B3',
+               // 'C3','E3','G3','C4','G3','C4'               
+];
+
+noteIndex = 0;
+
+
+function make2Darray(cols, rows) {
+  var arr = new Array(cols);
+  for (var i = 0; i < arr.length; i++) {
+    arr[i] = new Array(rows);
+  }
+  return arr;
+}
+
+
+function preload(){
+  for (var i = 0; i < 500; i++){
+    stadium[i] = loadImage('images/img' + i + '.jpg');
+  }
+}
+
+function setup() {
+  createCanvas(windowWidth, windowHeight);
+  
+  grid = make2Darray(cols, rows);
+  // for every column/row index, insert an array
+  for (var i = 0; i < cols; i++) {
+    for (var j = 0; j < rows; j++) {
+      grid[i][j] = random(stadium);
+    }
+  }
+  noLoop();
+
+
+  duoSynth = new Tone.DuoSynth({
+        "vibratoAmount": 0.5,
+        "vibratoRate": 3,
+        "harmonicity": 1.5,
+        "voice0": {
+          "volume": -10,
+          "portamento": 0,
+          "oscillator": {
+            "type": "sine"
+          },
+          "filterEnvelope": {
+            "attack": 0.05,
+            "decay": 0.3,
+            "sustain": 0.4,
+            "release": 0.5
+          },
+          "envelope": {
+            "attack": 0.01,
+            "decay": 0.3,
+            "sustain": 0.4,
+            "release": 0.5
+          }
+        },
+        "voice1": {
+          "volume": -10,
+          "portamento": 0,
+          "oscillator": {
+            "type": "sine"
+            },
+          "filterEnvelope": {
+            "attack": 0.01,
+            "decay": 0.3,
+            "sustain": 0.4,
+            "release": 0.5
+          },
+          "envelope": {
+            "attack": 0.05,
+            "decay": 0.3,
+            "sustain": 0.4,
+            "release": 0.5
+          }
+        }
+    }).toMaster();
+  }
+
+
+function mouseClicked(){
+  draw();
+
+  duoSynth.triggerAttackRelease(notes[noteIndex], '8n');
+  noteIndex++;
+  if (noteIndex >= notes.length) {
+    noteIndex = 0;
+  }
+}
+
+function draw() {
+  grid = shuffle(grid);
+
+  let cellWidth = width/cols;
+  let cellHeight = height/rows; 
+
+//   look through all columns and rows and insert image array in grid
+  for (var i = 0; i < cols; i++) {
+    for (var j = 0; j < rows; j++) {
+      var x = i * cellWidth;
+      var y = j * cellHeight;
+      image(grid[i][j], x, y, cellWidth, cellHeight);
+    }
+  }
+}
+
+function windowResized(){
+  resizeCanvas(windowWidth, windowHeight);
+}
+
+</script>
+</body>
+</html>
